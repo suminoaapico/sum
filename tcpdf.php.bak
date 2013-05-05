@@ -1,0 +1,280 @@
+<?php
+session_start();
+require_once('tcpdf/config/lang/eng.php');
+require_once('tcpdf/tcpdf.php');
+
+// create new PDF document
+$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+// set document information
+$pdf->SetCreator(PDF_CREATOR);
+$pdf->SetAuthor('Nicola Asuni');
+$pdf->SetTitle('TCPDF BookShopOnline ');
+$pdf->SetSubject('TCPDF Tutorial');
+$pdf->SetKeywords('TCPDF, PDF, BookShopOnliine, test, guide');
+
+$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+// set font
+$pdf->SetFont('freeserif', '', 20); 
+
+// add a page
+$pdf->AddPage();
+
+$pdf->Write(0, 'BookShopOnline', '', 0, 'C', true, 0, false, false, 0);
+$pdf->Write(0, 'ใบชำระสินค้า/ใบเสร็จรับเงิน', '', 0, 'C', true, 0, false, false, 0);
+// -----------------------------------------------------------------------------
+$pdf->SetFont('freeserif', '', 14); 
+// -----------------------------------------------------------------------------// เชื่อต่อกับฐานข้อมูล
+$db_ad ="localhost";
+$db_user ="ipostdoc_top";
+$db_pass="top35369";
+$db_name="ipostdoc_book";
+$con = @mysqli_connect($db_ad,$db_user,$db_pass)or die ("Can not connect MySQL");
+mysqli_select_db($con,$db_name)or die ("Can not connect database");
+//require('../fpdf/fpdf.php');
+$user=$_GET["User"];
+//$user = $_SESSION["valid_user"];
+$ID_Order = $_GET["ID_Order"];
+$result = mysqli_query($con, "SELECT *
+     FROM bso_member, bso_order, bso_book
+     WHERE bso_member.ID_Member = bso_order.ID_Member AND bso_book.ID_Book = bso_order.ID_Book  AND bso_member.Us_Member =  '{$user}' AND ID_order='{$ID_Order}' LIMIT 0 , 30" );	 
+$row = mysqli_fetch_array($result);
+
+$result1 = mysqli_query($con, "SELECT *
+     FROM bso_member, bso_order, bso_book
+     WHERE bso_member.ID_Member = bso_order.ID_Member AND bso_book.ID_Book = bso_order.ID_Book  AND bso_member.Us_Member =  '{$user}' AND ID_order='{$ID_Order}' LIMIT 1 , 30" );	 
+
+$result2 = mysqli_query($con, "SELECT *
+     FROM bso_member, bso_order, bso_book
+     WHERE bso_member.ID_Member = bso_order.ID_Member AND bso_book.ID_Book = bso_order.ID_Book  AND bso_member.Us_Member =  '{$user}' AND ID_order='{$ID_Order}' LIMIT 2 , 30" );	 
+
+$result3 = mysqli_query($con, "SELECT *
+     FROM bso_member, bso_order, bso_book
+     WHERE bso_member.ID_Member = bso_order.ID_Member AND bso_book.ID_Book = bso_order.ID_Book  AND bso_member.Us_Member =  '{$user}' AND ID_order='{$ID_Order}' LIMIT 3 , 30" );	 
+	
+$result4 = mysqli_query($con, "SELECT *
+     FROM bso_member, bso_order, bso_book
+     WHERE bso_member.ID_Member = bso_order.ID_Member AND bso_book.ID_Book = bso_order.ID_Book  AND bso_member.Us_Member =  '{$user}' AND ID_order='{$ID_Order}' LIMIT 4 , 30" );	 
+	 
+$result5 = mysqli_query($con, "SELECT *
+     FROM bso_member, bso_order, bso_book
+     WHERE bso_member.ID_Member = bso_order.ID_Member AND bso_book.ID_Book = bso_order.ID_Book  AND bso_member.Us_Member =  '{$user}' AND ID_order='{$ID_Order}' LIMIT 5, 30" );	 
+
+$result6 = mysqli_query($con, "SELECT *
+     FROM bso_member, bso_order, bso_book
+     WHERE bso_member.ID_Member = bso_order.ID_Member AND bso_book.ID_Book = bso_order.ID_Book  AND bso_member.Us_Member =  '{$user}' AND ID_order='{$ID_Order}' LIMIT 6, 30" );	 
+	 
+$result7 = mysqli_query($con, "SELECT *
+     FROM bso_member, bso_order, bso_book
+     WHERE bso_member.ID_Member = bso_order.ID_Member AND bso_book.ID_Book = bso_order.ID_Book  AND bso_member.Us_Member =  '{$user}' AND ID_order='{$ID_Order}' LIMIT 7, 30" );	
+// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+$date = date("H:i:s d/m/Y");
+$pdf->Write(0, "เลขที่  {$row['ID_Order']}", '', 0, 'R', true, 0, false, false, 0);
+$pdf->Write(0, "รหัสสมาชิก : {$row['ID_Member']}    โทร: {$row['Te_Member']}                                                      สถานะ : {$row['Status_o']}", '', 0, 'L', true, 0, false, false, 0);
+$pdf->Write(0, "User : {$row['Us_Member']}    อีเมล์: {$row['Em_Member']} ", '', 0, 'L', true, 0, false, false, 0);
+$pdf->Write(0, "วันที่สั่งรายการ :    {$row['Da_Order']} ", '', 0, 'L', true, 0, false, false, 0);
+$pdf->Write(0, "วันที่พิมพ์รายการ : {$date}", '', 0, 'L', true, 0, false, false, 0);
+$pdf->Write(0, "", '', 0, 'L', true, 0, false, false, 0);
+$pdf->Write(0, 'ได้ทำการสั่งรายการหนังสือดังนี้', '', 0, 'L', true, 0, false, false, 0);
+
+// NON-BREAKING ROWS (nobr="true")
+$pdf->SetFont('freeserif', '', 10); 
+$Va_BookSum = $row['Va_Book']* $row['Number'];
+
+$tbl = <<<EOD
+<table border="1" cellpadding="1" cellspacing="1" align="center">
+ <tr nobr="true" style="background-color:#F2F2F2" WIDTH=400>
+ <th>รหัส</th>
+ <th>ชื่อหนังสือ</th>
+<th>จำนวนหนังสือ</th>
+<th>ราคาต่อหน่วย</th>
+<th>ราคารวม</th>
+ </tr>
+</table>
+EOD;
+$pdf->writeHTML($tbl, true, false, false, false, '');
+//-----------------------------------------------------------------------
+	   $ID_Book=$row['ID_Book'];
+	   $Na_Book=$row['Na_Book'];
+	   $Number=$row['Number'];
+	   $Va_Book=$row['Va_Book'];
+	   $Va_BookSum = $row['Va_Book']* $row['Number'];
+	   
+$row1 = mysqli_fetch_array($result1);
+	   $ID_Book1=$row1['ID_Book'];
+	   $Na_Book1=$row1['Na_Book'];
+	   $Number1=$row1['Number'];
+	     $Va_Book1=$row1['Va_Book'];
+	   $Sum1 = $row1['Va_Book']* $row1['Number'];
+	   if($Sum1 ==0)
+	        $Sum1 = '';
+	   else
+		     $Sum1 = $row1['Va_Book']* $row1['Number'];
+	   
+$row2 = mysqli_fetch_array($result2);
+	   $ID_Book2=$row2['ID_Book'];
+	   $Na_Book2=$row2['Na_Book'];
+	   $Number2=$row2['Number'];
+	    $Va_Book2=$row2['Va_Book'];
+	   $Sum2 = $row2['Va_Book']* $row2['Number'];
+	   if($Sum2 ==0)
+	        $Sum2 = '';
+	   else
+		     $Sum2 = $row2['Va_Book']* $row2['Number'];
+
+$row3 = mysqli_fetch_array($result3);
+	   $ID_Book3=$row3['ID_Book'];
+	   $Na_Book3=$row3['Na_Book'];
+	   $Number3=$row3['Number'];
+	     $Va_Book3=$row3['Va_Book'];
+	   $Va_BookSum3 = $row3['Va_Book']* $row3['Number'];
+	   if($Va_BookSum3 ==0)
+	        $Sum3 = '';
+	   else
+		     $Sum3 = $row3['Va_Book']* $row3['Number'];	
+
+$row4 = mysqli_fetch_array($result4);
+	   $ID_Book4=$row4['ID_Book'];
+	   $Na_Book4=$row4['Na_Book'];
+	   $Number4=$row4['Number'];
+	     $Va_Book4=$row4['Va_Book'];
+	   $Va_BookSum4 = $row4['Va_Book']* $row4['Number'];
+	   if($Va_BookSum4 ==0)
+	        $Sum4 = '';
+	   else
+		     $Sum4 = $row4['Va_Book']* $row4['Number'];	
+			 
+
+$row5 = mysqli_fetch_array($result5);
+	   $ID_Book5=$row5['ID_Book'];
+	   $Na_Book5=$row5['Na_Book'];
+	   $Number5=$row5['Number'];
+	     $Va_Book5=$row5['Va_Book'];
+	   $Va_BookSum5 = $row5['Va_Book']* $row5['Number'];
+	   if($Va_BookSum5 ==0)
+	        $Sum5 = '';
+	   else
+		     $Sum5 = $row5['Va_Book']* $row5['Number'];	
+			 
+$row6 = mysqli_fetch_array($result6);
+	   $ID_Book6=$row6['ID_Book'];
+	   $Na_Book6=$row6['Na_Book'];
+	   $Number6=$row6['Number'];
+	     $Va_Book6=$row6['Va_Book'];
+	   $Va_BookSum6 = $row6['Va_Book']* $row6['Number'];
+	   if($Va_BookSum6 ==0)
+	        $Sum6 = '';
+	   else
+		     $Sum6 = $row6['Va_Book']* $row6['Number'];	
+		
+			 
+$row7 = mysqli_fetch_array($result7);
+	   $ID_Book7=$row7['ID_Book'];
+	   $Na_Book7=$row7['Na_Book'];
+	   $Number7=$row7['Number'];
+	     $Va_Book7=$row7['Va_Book'];
+	   $Va_BookSum7 = $row7['Va_Book']* $row7['Number'];
+	   if($Va_BookSum7 ==0)
+	        $Sum7 = '';
+	   else
+		     $Sum7 = $row7['Va_Book']* $row7['Number'];	
+//-----------------------------------------------------
+$Sum = $Va_BookSum+$Sum1+ $Sum2+ $Sum3+$Sum4+ $Sum5 +$Sum6+$Sum7;
+
+include('promotion.php');
+
+$tbl = <<<EOD
+<table border="0" cellpadding="0" cellspacing="0" align="center">
+ <tr nobr="true">
+ <td>$ID_Book</td>
+ <td> $Na_Book</td>
+ <td> $Number</td>
+ <td> $Va_Book</td>
+<td> $Va_BookSum</td>
+</tr>
+ <tr nobr="true">
+ <td> $ID_Book1</td>
+ <td> $Na_Book1</td>
+ <td> $Number1</td>
+ <td> $Va_Book1</td>
+<td> $Sum1</td>
+</tr> 
+
+ <tr nobr="true">
+ <td> $ID_Book2</td>
+ <td> $Na_Book2</td>
+ <td> $Number2</td>
+ <td> $Va_Book2</td>
+<td> $Sum2</td>
+</tr> 
+
+ <tr nobr="true">
+ <td> $ID_Book3</td>
+ <td> $Na_Book3</td>
+ <td> $Number3</td>
+ <td> $Va_Book3</td>
+<td> $Sum3</td>
+</tr> 
+
+ <tr nobr="true">
+ <td> $ID_Book4</td>
+ <td> $Na_Book4</td>
+ <td> $Number4</td>
+ <td> $Va_Book4</td>
+<td> $Sum4</td>
+</tr> 
+
+ <tr nobr="true">
+ <td> $ID_Book5</td>
+ <td> $Na_Book5</td>
+ <td> $Number5</td>
+ <td> $Va_Book5</td>
+<td> $Sum5</td>
+</tr> 
+
+ <tr nobr="true">
+ <td> $ID_Book6</td>
+ <td> $Na_Book6</td>
+ <td> $Number6</td>
+ <td> $Va_Book6</td>
+<td> $Sum6</td>
+</tr> 
+ <tr nobr="true">
+ <td> $ID_Book7</td>
+ <td> $Na_Book7</td>
+ <td> $Number7</td>
+ <td> $Va_Book7</td>
+<td> $Sum7</td>
+</tr>
+
+<tr>
+<td  align="RIGHT" colspan="5"></td>
+</tr>
+<tr>
+<td  align="RIGHT" colspan="5">ผลรวม $Sum บาท</td>
+</tr>
+<tr>
+<td  align="RIGHT" colspan="5">ส่วนลด  $Di บาท</td>
+</tr>
+<tr>
+<td  align="RIGHT" colspan="5">ยอดรวมสุทธิ  $Dis บาท</td>
+</tr>
+</table>
+EOD;
+
+$pdf->writeHTML($tbl, true, false, false, false, '');
+//--------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+
+
+// ------------------------------------------------------------------------------------
+
+//Close and output PDF document
+$pdf->Output('example_048.pdf', 'I');
+
+//============================================================+
+// END OF FILE                                                
+//============================================================+
